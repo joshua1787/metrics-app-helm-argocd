@@ -1,5 +1,3 @@
-# values.yaml - Final version for metrics-app with working Ingress
-
 replicaCount: 1
 
 image:
@@ -32,11 +30,11 @@ ingress:
   enabled: true
   className: "nginx"
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /counter
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
   hosts:
     - host: localhost
       paths:
-        - path: /counter
+        - path: /counter(/|$)(.*)
           pathType: Prefix
   tls: []
 
@@ -46,11 +44,16 @@ livenessProbe:
   httpGet:
     path: /counter
     port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 15
+  failureThreshold: 6
 
 readinessProbe:
   httpGet:
     path: /counter
     port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
 
 autoscaling:
   enabled: false
@@ -65,7 +68,6 @@ nodeSelector: {}
 tolerations: []
 affinity: {}
 
-# ✅ Secret Environment Variables
 env:
   password: "MYPASSWORD"
 
